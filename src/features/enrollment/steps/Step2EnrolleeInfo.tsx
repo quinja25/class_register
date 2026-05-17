@@ -6,6 +6,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { step2Schema, type Step2Values, type GroupStep2Values } from '../schemas/step2Schema';
 import { useEnrollmentForm } from '../hooks/useEnrollmentForm';
 import { GroupToIndividualDialog } from '../components/GroupToIndividualDialog';
+import { TextField } from '../components/fields/TextField';
+import { TextAreaField } from '../components/fields/TextAreaField';
+import { ParticipantRow } from '../components/fields/ParticipantRow';
+import { inputCn, FieldError } from '../components/fields/FormField';
 
 // Flat form type to avoid discriminated union conflicts with RHF.
 // Zod resolver still validates against step2Schema at submit time.
@@ -28,20 +32,6 @@ function hasGroupData(values: Step2FormData): boolean {
     (values.headCount !== undefined && !isNaN(values.headCount) && values.headCount !== 2) ||
     values.participants.some(p => p.name || p.email)
   );
-}
-
-function inputCn(hasError: boolean): string {
-  return [
-    'w-full rounded-lg border px-3 py-2 text-sm outline-none transition-colors',
-    hasError
-      ? 'border-red-400 bg-red-50 focus:border-red-500'
-      : 'border-zinc-300 focus:border-blue-500',
-  ].join(' ');
-}
-
-function FieldError({ message }: { message?: string }) {
-  if (!message) return null;
-  return <p className="mt-1 text-xs text-red-500">{message}</p>;
 }
 
 export function Step2EnrolleeInfo() {
@@ -143,10 +133,7 @@ export function Step2EnrolleeInfo() {
         type: 'manual',
         message: `잔여 정원 부족으로 최대 ${maxHeadCount}명까지 신청 가능합니다`,
       });
-      setTimeout(() => {
-        const el = formRef.current?.querySelector('[aria-invalid="true"]') as HTMLElement | null;
-        if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.focus(); }
-      }, 0);
+      scrollToFirstError();
       return;
     }
     dispatch({ type: 'SET_STEP2', payload: data as Step2Values });
@@ -200,66 +187,41 @@ export function Step2EnrolleeInfo() {
 
           {/* Common fields */}
           <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-zinc-700 mb-1">
-                이름 <span className="text-red-500">*</span>
-              </label>
-              <input
-                {...register('name')}
-                onBlur={() => trigger('name')}
-                aria-invalid={!!errors.name}
-                className={inputCn(!!errors.name)}
-                placeholder="홍길동"
-              />
-              <FieldError message={errors.name?.message} />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-zinc-700 mb-1">
-                이메일 <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="email"
-                {...register('email')}
-                onBlur={() => trigger('email')}
-                aria-invalid={!!errors.email}
-                className={inputCn(!!errors.email)}
-                placeholder="example@email.com"
-              />
-              <FieldError message={errors.email?.message} />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-zinc-700 mb-1">
-                전화번호 <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="tel"
-                {...register('phone')}
-                onBlur={() => trigger('phone')}
-                aria-invalid={!!errors.phone}
-                className={inputCn(!!errors.phone)}
-                placeholder="010-1234-5678"
-              />
-              <FieldError message={errors.phone?.message} />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-zinc-700 mb-1">
-                수강 동기
-                <span className="ml-1 text-xs font-normal text-zinc-400">(선택, 최대 300자)</span>
-              </label>
-              <textarea
-                {...register('motivation')}
-                onBlur={() => trigger('motivation')}
-                aria-invalid={!!errors.motivation}
-                rows={3}
-                maxLength={300}
-                className={inputCn(!!errors.motivation) + ' resize-none'}
-                placeholder="수강 동기를 입력해주세요"
-              />
-              <FieldError message={errors.motivation?.message} />
-            </div>
+            <TextField
+              label="이름"
+              required
+              placeholder="홍길동"
+              error={errors.name?.message}
+              registration={register('name')}
+              onBlur={() => trigger('name')}
+            />
+            <TextField
+              label="이메일"
+              required
+              type="email"
+              placeholder="example@email.com"
+              error={errors.email?.message}
+              registration={register('email')}
+              onBlur={() => trigger('email')}
+            />
+            <TextField
+              label="전화번호"
+              required
+              type="tel"
+              placeholder="010-1234-5678"
+              error={errors.phone?.message}
+              registration={register('phone')}
+              onBlur={() => trigger('phone')}
+            />
+            <TextAreaField
+              label="수강 동기"
+              hint="(선택, 최대 300자)"
+              placeholder="수강 동기를 입력해주세요"
+              maxLength={300}
+              error={errors.motivation?.message}
+              registration={register('motivation')}
+              onBlur={() => trigger('motivation')}
+            />
           </div>
 
           {/* Group-only fields */}
@@ -278,19 +240,14 @@ export function Step2EnrolleeInfo() {
                 )}
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-zinc-700 mb-1">
-                  단체명 <span className="text-red-500">*</span>
-                </label>
-                <input
-                  {...register('organizationName')}
-                  onBlur={() => trigger('organizationName')}
-                  aria-invalid={!!groupErrors.organizationName}
-                  className={inputCn(!!groupErrors.organizationName)}
-                  placeholder="(주)회사명"
-                />
-                <FieldError message={groupErrors.organizationName?.message} />
-              </div>
+              <TextField
+                label="단체명"
+                required
+                placeholder="(주)회사명"
+                error={groupErrors.organizationName?.message}
+                registration={register('organizationName')}
+                onBlur={() => trigger('organizationName')}
+              />
 
               <div>
                 <label className="block text-sm font-medium text-zinc-700 mb-1">
@@ -315,55 +272,31 @@ export function Step2EnrolleeInfo() {
                 </p>
                 <div className="space-y-2">
                   {fields.map((field, index) => (
-                    <div key={field.id} className="flex items-start gap-2">
-                      <span className="mt-2.5 w-5 flex-shrink-0 text-right text-xs text-zinc-400">
-                        {index + 1}
-                      </span>
-                      <div className="flex-1">
-                        <input
-                          {...register(`participants.${index}.name`)}
-                          onBlur={() => trigger(`participants.${index}.name`)}
-                          aria-invalid={!!groupErrors.participants?.[index]?.name}
-                          className={inputCn(!!groupErrors.participants?.[index]?.name)}
-                          placeholder="이름"
-                        />
-                        <FieldError message={groupErrors.participants?.[index]?.name?.message} />
-                      </div>
-                      <div className="flex-1">
-                        <input
-                          type="email"
-                          {...register(`participants.${index}.email`)}
-                          onBlur={() => trigger(`participants.${index}.email`)}
-                          aria-invalid={!!groupErrors.participants?.[index]?.email}
-                          className={inputCn(!!groupErrors.participants?.[index]?.email)}
-                          placeholder="이메일"
-                        />
-                        <FieldError message={groupErrors.participants?.[index]?.email?.message} />
-                        {!groupErrors.participants?.[index]?.email &&
-                          applicantEmail &&
-                          participants?.[index]?.email?.toLowerCase() === applicantEmail.toLowerCase() && (
-                            <p className="mt-0.5 text-xs text-amber-600">대표 신청자와 동일한 이메일입니다</p>
-                          )}
-                      </div>
-                    </div>
+                    <ParticipantRow
+                      key={field.id}
+                      index={index}
+                      nameRegistration={register(`participants.${index}.name`)}
+                      emailRegistration={register(`participants.${index}.email`)}
+                      onBlurName={() => trigger(`participants.${index}.name`)}
+                      onBlurEmail={() => trigger(`participants.${index}.email`)}
+                      nameError={groupErrors.participants?.[index]?.name?.message}
+                      emailError={groupErrors.participants?.[index]?.email?.message}
+                      applicantEmail={applicantEmail}
+                      currentEmail={participants?.[index]?.email}
+                    />
                   ))}
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-zinc-700 mb-1">
-                  담당자 연락처 <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="tel"
-                  {...register('contactPerson')}
-                  onBlur={() => trigger('contactPerson')}
-                  aria-invalid={!!groupErrors.contactPerson}
-                  className={inputCn(!!groupErrors.contactPerson)}
-                  placeholder="010-1234-5678"
-                />
-                <FieldError message={groupErrors.contactPerson?.message} />
-              </div>
+              <TextField
+                label="담당자 연락처"
+                required
+                type="tel"
+                placeholder="010-1234-5678"
+                error={groupErrors.contactPerson?.message}
+                registration={register('contactPerson')}
+                onBlur={() => trigger('contactPerson')}
+              />
             </div>
           )}
 
