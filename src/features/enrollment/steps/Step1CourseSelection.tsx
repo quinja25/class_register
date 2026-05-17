@@ -66,6 +66,7 @@ export function Step1CourseSelection() {
   });
 
   const selectedCourseId = watch('selectedCourseId');
+  const enrollmentType = watch('enrollmentType');
 
   // Keep a full unfiltered course list for the selected course summary
   const { data: allData } = useCourses(undefined);
@@ -84,6 +85,9 @@ export function Step1CourseSelection() {
   }
 
   function onSubmit(data: Step1Values) {
+    if (selectedCourse) {
+      dispatch({ type: 'SET_SELECTED_COURSE', payload: selectedCourse });
+    }
     dispatch({ type: 'SET_STEP1', payload: data });
     dispatch({ type: 'GO_TO_STEP', payload: 2 });
   }
@@ -169,6 +173,19 @@ export function Step1CourseSelection() {
             register={register}
             error={errors.enrollmentType}
           />
+          {enrollmentType === 'group' && selectedCourse && (() => {
+            const remaining = selectedCourse.maxCapacity - selectedCourse.currentEnrollment;
+            if (remaining >= 10) return null;
+            return (
+              <div className="mt-3 flex items-start gap-2 rounded-lg border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-700">
+                <span className="mt-0.5 shrink-0">⚠</span>
+                <span>
+                  선택한 강의의 잔여 정원이 <strong>{remaining}석</strong>입니다.
+                  다음 단계에서 신청 인원을 {remaining}명 이하로 입력해주세요.
+                </span>
+              </div>
+            );
+          })()}
         </div>
 
         {/* Navigation */}

@@ -1,7 +1,7 @@
 import type { Step1Values } from '../schemas/step1Schema';
 import type { Step2Values } from '../schemas/step2Schema';
 import type { Step3Values } from '../schemas/step3Schema';
-import type { EnrollmentResponse } from '../types/enrollment';
+import type { Course, EnrollmentResponse } from '../types/enrollment';
 
 export type Step = 1 | 2 | 3;
 
@@ -11,6 +11,7 @@ export interface EnrollmentFormState {
   step2: Step2Values | null;
   step3: Step3Values | null;
   result: EnrollmentResponse | null;
+  selectedCourse: Course | null;
 }
 
 export const initialState: EnrollmentFormState = {
@@ -19,12 +20,14 @@ export const initialState: EnrollmentFormState = {
   step2: null,
   step3: null,
   result: null,
+  selectedCourse: null,
 };
 
 export type EnrollmentAction =
   | { type: 'SET_STEP1'; payload: Step1Values }
   | { type: 'SET_STEP2'; payload: Step2Values }
   | { type: 'SET_STEP3'; payload: Step3Values }
+  | { type: 'SET_SELECTED_COURSE'; payload: Course }
   | { type: 'CLEAR_STEP2' }
   | { type: 'GO_TO_STEP'; payload: Step }
   | { type: 'SET_RESULT'; payload: EnrollmentResponse }
@@ -41,6 +44,8 @@ export function enrollmentReducer(
       return { ...state, step2: action.payload };
     case 'SET_STEP3':
       return { ...state, step3: action.payload };
+    case 'SET_SELECTED_COURSE':
+      return { ...state, selectedCourse: action.payload };
     case 'CLEAR_STEP2':
       return { ...state, step2: null };
     case 'GO_TO_STEP':

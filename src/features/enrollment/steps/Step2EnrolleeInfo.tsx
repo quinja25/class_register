@@ -50,6 +50,11 @@ export function Step2EnrolleeInfo() {
   const formRef = useRef<HTMLFormElement>(null);
 
   const enrollmentType = state.step1?.enrollmentType ?? 'personal';
+  const remaining = state.selectedCourse
+    ? state.selectedCourse.maxCapacity - state.selectedCourse.currentEnrollment
+    : Infinity;
+  // 본인이 1석 차지하므로 단체 인원 최대 = 잔여 - 1 (최대 10명 제한 유지)
+  const maxHeadCount = remaining === Infinity ? 10 : Math.min(10, remaining - 1);
 
   const saved = state.step2 as (Step2FormData & Partial<GroupStep2Values>) | null;
   const defaultValues: Step2FormData = {
@@ -246,7 +251,18 @@ export function Step2EnrolleeInfo() {
           {/* Group-only fields */}
           {currentType === 'group' && (
             <div className="space-y-4 rounded-xl border border-zinc-200 bg-zinc-50 p-4">
-              <p className="text-sm font-semibold text-zinc-800">단체 신청 정보</p>
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-semibold text-zinc-800">단체 신청 정보</p>
+                {remaining !== Infinity && (
+                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+                    maxHeadCount <= 2
+                      ? 'bg-red-100 text-red-600'
+                      : 'bg-orange-100 text-orange-600'
+                  }`}>
+                    최대 {maxHeadCount}명 신청 가능
+                  </span>
+                )}
+              </div>
 
               <div>
                 <label className="block text-sm font-medium text-zinc-700 mb-1">
@@ -270,8 +286,15 @@ export function Step2EnrolleeInfo() {
                 <input
                   type="number"
                   min={2}
-                  max={10}
-                  {...register('headCount', { valueAsNumber: true })}
+                  max={maxHeadCount}
+                  {...register('headCount', {
+                    valueAsNumber: true,
+                    validate: (v) => {
+                      const n = Number(v);
+                      if (isNaN(n) || currentType !== 'group') return true;
+                      return n <= maxHeadCount || `잔여 정원 부족으로 최대 ${maxHeadCount}명까지 신청 가능합니다`;
+                    },
+                  })}
                   onBlur={() => trigger('headCount')}
                   aria-invalid={!!groupErrors.headCount}
                   className={inputCn(!!groupErrors.headCount) + ' w-32'}
