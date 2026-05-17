@@ -51,21 +51,21 @@ export function Step2EnrolleeInfo() {
 
   const enrollmentType = state.step1?.enrollmentType ?? 'personal';
 
-  const defaultValues: Step2FormData = state.step2
-    ? { ...(state.step2 as Step2FormData), participants: (state.step2 as GroupStep2Values).participants ?? [] }
-    : enrollmentType === 'group'
-      ? {
-          type: 'group',
-          name: '',
-          email: '',
-          phone: '',
-          motivation: '',
-          organizationName: '',
-          headCount: 2,
-          participants: [{ name: '', email: '' }, { name: '', email: '' }],
-          contactPerson: '',
-        }
-      : { type: 'personal', name: '', email: '', phone: '', motivation: '', participants: [] };
+  const saved = state.step2 as (Step2FormData & Partial<GroupStep2Values>) | null;
+  const defaultValues: Step2FormData = {
+    type: saved?.type ?? enrollmentType,
+    name: saved?.name ?? '',
+    email: saved?.email ?? '',
+    phone: saved?.phone ?? '',
+    motivation: saved?.motivation ?? '',
+    // always initialize group fields so they are registered even when type='personal'
+    organizationName: saved?.organizationName ?? '',
+    headCount: saved?.headCount ?? 2,
+    participants: saved?.participants ?? (enrollmentType === 'group'
+      ? [{ name: '', email: '' }, { name: '', email: '' }]
+      : []),
+    contactPerson: saved?.contactPerson ?? '',
+  };
 
   const {
     register,

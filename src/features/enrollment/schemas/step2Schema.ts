@@ -23,7 +23,7 @@ const personalSchema = baseInfoSchema.extend({
 
 const groupSchema = baseInfoSchema.extend({
   type: z.literal('group'),
-  organizationName: z.string().min(1, '단체명을 입력해주세요'),
+  organizationName: z.string().trim().min(1, '단체명을 입력해주세요'),
   headCount: z
     .number({ error: '인원수를 입력해주세요' })
     .int()
@@ -32,7 +32,7 @@ const groupSchema = baseInfoSchema.extend({
   participants: z
     .array(
       z.object({
-        name: z.string().min(1, '참가자 이름을 입력해주세요'),
+        name: z.string().trim().min(1, '참가자 이름을 입력해주세요').min(2, '이름은 2자 이상이어야 합니다'),
         email: z.string().email('올바른 이메일 형식이 아닙니다'),
       })
     )
