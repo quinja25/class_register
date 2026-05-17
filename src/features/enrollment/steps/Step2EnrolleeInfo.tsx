@@ -77,6 +77,7 @@ export function Step2EnrolleeInfo() {
     handleSubmit,
     watch,
     setValue,
+    setError,
     trigger,
     getValues,
     control,
@@ -95,7 +96,7 @@ export function Step2EnrolleeInfo() {
   // Sync participants array length with headCount
   useEffect(() => {
     if (currentType !== 'group') return;
-    const count = Math.min(Math.max(Number(headCount) || 2, 2), 10);
+    const count = Math.min(Math.max(Number(headCount) || 2, 2), maxHeadCount);
     if (count > fields.length) {
       for (let i = fields.length; i < count; i++) {
         append({ name: '', email: '' }, { shouldFocus: false });
@@ -135,6 +136,17 @@ export function Step2EnrolleeInfo() {
   }
 
   function onSubmit(data: Step2FormData) {
+    if (currentType === 'group' && (data.headCount ?? 0) > maxHeadCount) {
+      setError('headCount', {
+        type: 'manual',
+        message: `잔여 정원 부족으로 최대 ${maxHeadCount}명까지 신청 가능합니다`,
+      });
+      setTimeout(() => {
+        const el = formRef.current?.querySelector('[aria-invalid="true"]') as HTMLElement | null;
+        if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.focus(); }
+      }, 0);
+      return;
+    }
     dispatch({ type: 'SET_STEP2', payload: data as Step2Values });
     dispatch({ type: 'GO_TO_STEP', payload: 3 });
   }
@@ -281,24 +293,17 @@ export function Step2EnrolleeInfo() {
               <div>
                 <label className="block text-sm font-medium text-zinc-700 mb-1">
                   신청 인원수 <span className="text-red-500">*</span>
-                  <span className="ml-1 text-xs font-normal text-zinc-400">(2~10명)</span>
+                  <span className="ml-1 text-xs font-normal text-zinc-400">(2~{maxHeadCount}명)</span>
                 </label>
-                <input
-                  type="number"
-                  min={2}
-                  max={maxHeadCount}
-                  {...register('headCount', {
-                    valueAsNumber: true,
-                    validate: (v) => {
-                      const n = Number(v);
-                      if (isNaN(n) || currentType !== 'group') return true;
-                      return n <= maxHeadCount || `잔여 정원 부족으로 최대 ${maxHeadCount}명까지 신청 가능합니다`;
-                    },
-                  })}
-                  onBlur={() => trigger('headCount')}
+                <select
+                  {...register('headCount', { setValueAs: (v) => Number(v) })}
                   aria-invalid={!!groupErrors.headCount}
-                  className={inputCn(!!groupErrors.headCount) + ' w-32'}
-                />
+                  className={inputCn(!!groupErrors.headCount) + ' w-32 cursor-pointer'}
+                >
+                  {Array.from({ length: maxHeadCount - 1 }, (_, i) => i + 2).map((n) => (
+                    <option key={n} value={n}>{n}명</option>
+                  ))}
+                </select>
                 <FieldError message={groupErrors.headCount?.message} />
               </div>
 
