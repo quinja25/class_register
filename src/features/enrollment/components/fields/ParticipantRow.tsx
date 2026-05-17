@@ -1,5 +1,6 @@
 import type { UseFormRegisterReturn } from 'react-hook-form';
 import { inputCn, FieldError } from './FormField';
+import { EmailField } from './EmailField';
 
 interface ParticipantRowProps {
   index: number;
@@ -11,6 +12,8 @@ interface ParticipantRowProps {
   emailError?: string;
   applicantEmail?: string;
   currentEmail?: string;
+  emailDefaultValue?: string;
+  onCompleteEmail: (value: string) => void;
 }
 
 export function ParticipantRow({
@@ -23,6 +26,8 @@ export function ParticipantRow({
   emailError,
   applicantEmail,
   currentEmail,
+  emailDefaultValue = '',
+  onCompleteEmail,
 }: ParticipantRowProps) {
   const isSameAsApplicant =
     !emailError &&
@@ -46,15 +51,14 @@ export function ParticipantRow({
         <FieldError message={nameError} />
       </div>
       <div className="flex-1">
-        <input
-          type="email"
-          {...emailRegistration}
+        <EmailField
+          registration={emailRegistration}
           onBlur={onBlurEmail}
-          aria-invalid={!!emailError}
-          className={inputCn(!!emailError)}
           placeholder="이메일"
+          error={emailError}
+          defaultValue={emailDefaultValue}
+          onComplete={onCompleteEmail}
         />
-        <FieldError message={emailError} />
         {isSameAsApplicant && (
           <p className="mt-0.5 text-xs text-amber-600">대표 신청자와 동일한 이메일입니다</p>
         )}

@@ -8,8 +8,10 @@ import { useEnrollmentForm } from '../hooks/useEnrollmentForm';
 import { GroupToIndividualDialog } from '../components/GroupToIndividualDialog';
 import { TextField } from '../components/fields/TextField';
 import { TextAreaField } from '../components/fields/TextAreaField';
+import { EmailField } from '../components/fields/EmailField';
 import { ParticipantRow } from '../components/fields/ParticipantRow';
 import { inputCn, FieldError } from '../components/fields/FormField';
+import { formatPhone } from '../utils/formatPhone';
 
 // Flat form type to avoid discriminated union conflicts with RHF.
 // Zod resolver still validates against step2Schema at submit time.
@@ -81,8 +83,10 @@ export function Step2EnrolleeInfo() {
 
   const currentType = watch('type');
   const headCount = watch('headCount');
+  const phone = watch('phone');
   const applicantEmail = watch('email');
   const participants = watch('participants');
+  const motivation = watch('motivation');
   const groupErrors = errors as FieldErrors<GroupStep2Values>;
 
   // Sync participants array length with headCount
@@ -195,14 +199,15 @@ export function Step2EnrolleeInfo() {
               registration={register('name')}
               onBlur={() => trigger('name')}
             />
-            <TextField
+            <EmailField
               label="이메일"
               required
-              type="email"
               placeholder="example@email.com"
               error={errors.email?.message}
               registration={register('email')}
               onBlur={() => trigger('email')}
+              defaultValue={saved?.email ?? ''}
+              onComplete={(v) => setValue('email', v, { shouldValidate: true })}
             />
             <TextField
               label="전화번호"
@@ -212,93 +217,110 @@ export function Step2EnrolleeInfo() {
               error={errors.phone?.message}
               registration={register('phone')}
               onBlur={() => trigger('phone')}
+              onChangeFormat={formatPhone}
             />
             <TextAreaField
               label="수강 동기"
               hint="(선택, 최대 300자)"
               placeholder="수강 동기를 입력해주세요"
               maxLength={300}
+              charCount={motivation?.length ?? 0}
               error={errors.motivation?.message}
               registration={register('motivation')}
               onBlur={() => trigger('motivation')}
             />
           </div>
 
-          {/* Group-only fields */}
-          {currentType === 'group' && (
-            <div className="space-y-4 rounded-xl border border-zinc-200 bg-zinc-50 p-4">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-semibold text-zinc-800">단체 신청 정보</p>
-                {remaining !== Infinity && (
-                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
-                    maxHeadCount <= 2
-                      ? 'bg-red-100 text-red-600'
-                      : 'bg-orange-100 text-orange-600'
-                  }`}>
-                    최대 {maxHeadCount}명 신청 가능
-                  </span>
-                )}
-              </div>
-
-              <TextField
-                label="단체명"
-                required
-                placeholder="(주)회사명"
-                error={groupErrors.organizationName?.message}
-                registration={register('organizationName')}
-                onBlur={() => trigger('organizationName')}
-              />
-
-              <div>
-                <label className="block text-sm font-medium text-zinc-700 mb-1">
-                  신청 인원수 <span className="text-red-500">*</span>
-                  <span className="ml-1 text-xs font-normal text-zinc-400">(2~{maxHeadCount}명)</span>
-                </label>
-                <select
-                  {...register('headCount', { setValueAs: (v) => Number(v) })}
-                  aria-invalid={!!groupErrors.headCount}
-                  className={inputCn(!!groupErrors.headCount) + ' w-32 cursor-pointer'}
-                >
-                  {Array.from({ length: maxHeadCount - 1 }, (_, i) => i + 2).map((n) => (
-                    <option key={n} value={String(n)}>{n}명</option>
-                  ))}
-                </select>
-                <FieldError message={groupErrors.headCount?.message} />
-              </div>
-
-              <div>
-                <p className="text-sm font-medium text-zinc-700 mb-2">
-                  참가자 명단 <span className="text-red-500">*</span>
-                </p>
-                <div className="space-y-2">
-                  {fields.map((field, index) => (
-                    <ParticipantRow
-                      key={field.id}
-                      index={index}
-                      nameRegistration={register(`participants.${index}.name`)}
-                      emailRegistration={register(`participants.${index}.email`)}
-                      onBlurName={() => trigger(`participants.${index}.name`)}
-                      onBlurEmail={() => trigger(`participants.${index}.email`)}
-                      nameError={groupErrors.participants?.[index]?.name?.message}
-                      emailError={groupErrors.participants?.[index]?.email?.message}
-                      applicantEmail={applicantEmail}
-                      currentEmail={participants?.[index]?.email}
-                    />
-                  ))}
+          {/* Group-only fields — always in DOM, animated via grid-template-rows */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateRows: currentType === 'group' ? '1fr' : '0fr',
+              transition: 'grid-template-rows 0.3s ease-out',
+            }}
+          >
+            <div style={{ overflow: 'hidden' }}>
+              <div className="space-y-4 rounded-xl border border-zinc-200 bg-zinc-50 p-4 pb-4">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-semibold text-zinc-800">단체 신청 정보</p>
+                  {remaining !== Infinity && (
+                    <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+                      maxHeadCount <= 2
+                        ? 'bg-red-100 text-red-600'
+                        : 'bg-orange-100 text-orange-600'
+                    }`}>
+                      최대 {maxHeadCount}명 신청 가능
+                    </span>
+                  )}
                 </div>
-              </div>
 
-              <TextField
-                label="담당자 연락처"
-                required
-                type="tel"
-                placeholder="010-1234-5678"
-                error={groupErrors.contactPerson?.message}
-                registration={register('contactPerson')}
-                onBlur={() => trigger('contactPerson')}
-              />
+                <TextField
+                  label="단체명"
+                  required
+                  placeholder="(주)회사명"
+                  error={groupErrors.organizationName?.message}
+                  registration={register('organizationName')}
+                  onBlur={() => trigger('organizationName')}
+                />
+
+                <div>
+                  <label className="block text-sm font-medium text-zinc-700 mb-1">
+                    신청 인원수 <span className="text-red-500">*</span>
+                    <span className="ml-1 text-xs font-normal text-zinc-400">(2~{maxHeadCount}명)</span>
+                  </label>
+                  <select
+                    {...register('headCount', { setValueAs: (v) => Number(v) })}
+                    aria-invalid={!!groupErrors.headCount}
+                    className={inputCn(!!groupErrors.headCount) + ' w-32 cursor-pointer'}
+                  >
+                    {Array.from({ length: maxHeadCount - 1 }, (_, i) => i + 2).map((n) => (
+                      <option key={n} value={String(n)}>{n}명</option>
+                    ))}
+                  </select>
+                  <FieldError message={groupErrors.headCount?.message} />
+                </div>
+
+                <div>
+                  <p className="text-sm font-medium text-zinc-700 mb-2">
+                    참가자 명단 <span className="text-red-500">*</span>
+                  </p>
+                  <div className="space-y-2">
+                    {fields.map((field, index) => (
+                      <ParticipantRow
+                        key={field.id}
+                        index={index}
+                        nameRegistration={register(`participants.${index}.name`)}
+                        emailRegistration={register(`participants.${index}.email`)}
+                        onBlurName={() => trigger(`participants.${index}.name`)}
+                        onBlurEmail={() => trigger(`participants.${index}.email`)}
+                        nameError={groupErrors.participants?.[index]?.name?.message}
+                        emailError={groupErrors.participants?.[index]?.email?.message}
+                        applicantEmail={applicantEmail}
+                        currentEmail={participants?.[index]?.email}
+                        emailDefaultValue={field.email}
+                        onCompleteEmail={(v) => setValue(`participants.${index}.email`, v, { shouldValidate: true })}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                <TextField
+                  label="담당자 연락처"
+                  required
+                  type="tel"
+                  placeholder="010-1234-5678"
+                  error={groupErrors.contactPerson?.message}
+                  registration={register('contactPerson')}
+                  onBlur={() => trigger('contactPerson')}
+                  onChangeFormat={formatPhone}
+                  action={phone ? {
+                    label: '신청자 전화번호와 동일',
+                    onClick: () => setValue('contactPerson', phone, { shouldValidate: true }),
+                  } : undefined}
+                />
+              </div>
             </div>
-          )}
+          </div>
 
           {/* Navigation */}
           <div className="flex justify-between pt-2">
