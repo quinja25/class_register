@@ -8,6 +8,7 @@ import {
   type EnrollmentAction,
 } from './enrollmentReducer';
 import { loadDraft, saveDraft, clearDraft } from '../hooks/useFormPersistence';
+import { useNavigationGuard } from '../hooks/useNavigationGuard';
 
 export interface EnrollmentFormContextValue {
   state: EnrollmentFormState;
@@ -51,11 +52,13 @@ export function EnrollmentFormProvider({ children }: { children: ReactNode }) {
     }
     if (draft.step1) {
       dispatch({ type: 'SET_STEP1', payload: draft.step1 });
-      dispatch({ type: 'GO_TO_STEP', payload: draft.step2 ? 2 : 1 });
     }
     if (draft.step2) {
       dispatch({ type: 'SET_STEP2', payload: draft.step2 });
-      dispatch({ type: 'GO_TO_STEP', payload: 2 });
+      // step2 present → user reached confirmation; go to step 3 so they can retry immediately
+      dispatch({ type: 'GO_TO_STEP', payload: 3 });
+    } else if (draft.step1) {
+      dispatch({ type: 'GO_TO_STEP', payload: 1 });
     }
     setHasDraft(false);
   }, []);
@@ -64,6 +67,10 @@ export function EnrollmentFormProvider({ children }: { children: ReactNode }) {
     clearDraft();
     setHasDraft(false);
   }, []);
+
+  // Guard navigation when form has data and submission is not complete
+  const guardActive = !!(state.step1 || state.step2) && !state.result;
+  useNavigationGuard(guardActive);
 
   return (
     <EnrollmentFormContext.Provider value={{ state, dispatch, hasDraft, restoreDraft, dismissDraft }}>
