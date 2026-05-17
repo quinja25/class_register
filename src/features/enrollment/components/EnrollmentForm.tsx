@@ -4,6 +4,7 @@ import { EnrollmentFormProvider } from '../context/EnrollmentFormContext';
 import { useEnrollmentForm } from '../hooks/useEnrollmentForm';
 import { StepIndicator } from './StepIndicator';
 import { Step1CourseSelection } from '../steps/Step1CourseSelection';
+import { Step2EnrolleeInfo } from '../steps/Step2EnrolleeInfo';
 
 function EnrollmentFormInner() {
   const { state } = useEnrollmentForm();
@@ -19,7 +20,7 @@ function EnrollmentFormInner() {
 
         <div className="bg-white rounded-2xl shadow-sm border border-zinc-200 p-8">
           {state.step === 1 && <Step1CourseSelection />}
-          {state.step === 2 && <div className="text-zinc-400">Step 2: 수강생 정보 (coming soon)</div>}
+          {state.step === 2 && <Step2EnrolleeInfo />}
           {state.step === 3 && <div className="text-zinc-400">Step 3: 확인 및 제출 (coming soon)</div>}
         </div>
       </div>
