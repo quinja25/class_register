@@ -119,11 +119,14 @@ export function Step2EnrolleeInfo() {
   }
 
   function scrollToFirstError() {
-    const el = formRef.current?.querySelector('[aria-invalid="true"]') as HTMLElement | null;
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      el.focus();
-    }
+    // Defer until after React re-renders with aria-invalid attributes applied
+    setTimeout(() => {
+      const el = formRef.current?.querySelector('[aria-invalid="true"]') as HTMLElement | null;
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.focus();
+      }
+    }, 0);
   }
 
   function onSubmit(data: Step2FormData) {
