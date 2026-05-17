@@ -91,6 +91,8 @@ export function Step2EnrolleeInfo() {
 
   const currentType = watch('type');
   const headCount = watch('headCount');
+  const applicantEmail = watch('email');
+  const participants = watch('participants');
   const groupErrors = errors as FieldErrors<GroupStep2Values>;
 
   // Sync participants array length with headCount
@@ -104,7 +106,7 @@ export function Step2EnrolleeInfo() {
     } else if (count < fields.length) {
       remove(Array.from({ length: fields.length - count }, (_, i) => fields.length - 1 - i));
     }
-  }, [headCount, currentType, fields.length]);
+  }, [headCount, currentType, fields.length, maxHeadCount]);
 
   function handleTypeClick(newType: 'personal' | 'group') {
     if (newType === currentType) return;
@@ -301,7 +303,7 @@ export function Step2EnrolleeInfo() {
                   className={inputCn(!!groupErrors.headCount) + ' w-32 cursor-pointer'}
                 >
                   {Array.from({ length: maxHeadCount - 1 }, (_, i) => i + 2).map((n) => (
-                    <option key={n} value={n}>{n}명</option>
+                    <option key={n} value={String(n)}>{n}명</option>
                   ))}
                 </select>
                 <FieldError message={groupErrors.headCount?.message} />
@@ -337,6 +339,11 @@ export function Step2EnrolleeInfo() {
                           placeholder="이메일"
                         />
                         <FieldError message={groupErrors.participants?.[index]?.email?.message} />
+                        {!groupErrors.participants?.[index]?.email &&
+                          applicantEmail &&
+                          participants?.[index]?.email?.toLowerCase() === applicantEmail.toLowerCase() && (
+                            <p className="mt-0.5 text-xs text-amber-600">대표 신청자와 동일한 이메일입니다</p>
+                          )}
                       </div>
                     </div>
                   ))}

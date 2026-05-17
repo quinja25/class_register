@@ -24,7 +24,7 @@ export const enrollmentHandlers = [
       );
     }
 
-    if (body.courseId === 'mkt-001') {
+    if (body.courseId === 'mkt-001' || url.searchParams.get('simulateCourseFull') === 'true') {
       return HttpResponse.json(
         { code: 'COURSE_FULL', message: '선택하신 강의의 정원이 마감되었습니다.' },
         { status: 409 }

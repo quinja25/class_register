@@ -5,7 +5,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { step3Schema, type Step3Values } from '../schemas/step3Schema';
 import { useEnrollmentForm } from '../hooks/useEnrollmentForm';
 import { useEnrollment } from '../hooks/useEnrollment';
-import { useCourses } from '../hooks/useCourses';
 import type { GroupStep2Values } from '../schemas/step2Schema';
 import type { EnrollmentRequest } from '../types/enrollment';
 
@@ -70,14 +69,16 @@ function Divider() {
 
 export function Step3Confirmation() {
   const { state, dispatch } = useEnrollmentForm();
-  const { data } = useCourses(undefined);
   const { mutate, isPending, error, reset: resetMutation } = useEnrollment();
 
-  const step1 = state.step1!;
-  const step2 = state.step2!;
+  const step1 = state.step1;
+  const step2 = state.step2;
+
+  if (!step1 || !step2) return null;
+
   const isGroup = step2.type === 'group';
   const groupData = isGroup ? (step2 as GroupStep2Values) : null;
-  const course = data?.courses.find(c => c.id === step1.selectedCourseId);
+  const course = state.selectedCourse;
 
   const {
     register,
@@ -89,30 +90,35 @@ export function Step3Confirmation() {
   });
 
   function buildRequest(terms: Step3Values): EnrollmentRequest {
+    // null guard at render time ensures step1/step2 are non-null when this is called
+    const s1 = state.step1!;
+    const s2 = state.step2!;
+    const gd = s2.type === 'group' ? (s2 as GroupStep2Values) : null;
+
     const applicant = {
-      name: step2.name,
-      email: step2.email,
-      phone: step2.phone,
-      ...(step2.motivation ? { motivation: step2.motivation } : {}),
+      name: s2.name,
+      email: s2.email,
+      phone: s2.phone,
+      ...(s2.motivation ? { motivation: s2.motivation } : {}),
     };
 
-    if (isGroup && groupData) {
+    if (gd) {
       return {
-        courseId: step1.selectedCourseId,
+        courseId: s1.selectedCourseId,
         type: 'group',
         applicant,
         group: {
-          organizationName: groupData.organizationName,
-          headCount: groupData.headCount,
-          participants: groupData.participants,
-          contactPerson: groupData.contactPerson,
+          organizationName: gd.organizationName,
+          headCount: gd.headCount,
+          participants: gd.participants,
+          contactPerson: gd.contactPerson,
         },
         agreedToTerms: terms.agreedToTerms,
       };
     }
 
     return {
-      courseId: step1.selectedCourseId,
+      courseId: s1.selectedCourseId,
       type: 'personal',
       applicant,
       agreedToTerms: terms.agreedToTerms,
