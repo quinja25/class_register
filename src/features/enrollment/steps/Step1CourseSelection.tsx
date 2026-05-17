@@ -34,7 +34,9 @@ function SelectedCourseSummary({ course }: { course: Course }) {
   const fmt = (d: string) => d.replace(/-/g, '.').slice(2);
   return (
     <div className="flex items-center gap-3 rounded-lg bg-blue-50 border border-blue-200 px-4 py-2.5 text-sm">
-      <span className="text-blue-500 text-base">✓</span>
+      <svg className="h-4 w-4 shrink-0 text-blue-500" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+      </svg>
       <div className="flex flex-wrap gap-x-3 gap-y-0.5">
         <span className="font-semibold text-blue-900">{course.title}</span>
         <span className="text-blue-700">{formatPrice(course.price)}</span>
@@ -148,8 +150,17 @@ export function Step1CourseSelection() {
           )}
 
           {!isLoading && !isError && courses.length === 0 && (
-            <div className="rounded-xl border-2 border-dashed border-zinc-200 p-8 text-center text-sm text-zinc-400">
-              해당 카테고리에 강의가 없습니다.
+            <div className="rounded-xl border-2 border-dashed border-zinc-200 p-8 text-center space-y-3">
+              <p className="text-sm text-zinc-400">해당 카테고리에 강의가 없습니다.</p>
+              {selectedCategory && (
+                <button
+                  type="button"
+                  onClick={() => setSelectedCategory(null)}
+                  className="text-sm font-medium text-blue-600 hover:underline"
+                >
+                  전체 강의 보기 →
+                </button>
+              )}
             </div>
           )}
 

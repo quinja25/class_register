@@ -1,10 +1,12 @@
 'use client';
 
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { step3Schema, type Step3Values } from '../schemas/step3Schema';
 import { useEnrollmentForm } from '../hooks/useEnrollmentForm';
 import { useEnrollment } from '../hooks/useEnrollment';
+import { TermsModal } from '../components/TermsModal';
 import type { GroupStep2Values } from '../schemas/step2Schema';
 import type { EnrollmentRequest } from '../types/enrollment';
 
@@ -15,11 +17,22 @@ const CATEGORY_LABELS: Record<string, string> = {
   business: '비즈니스',
 };
 
-const ERROR_MESSAGES: Record<string, string> = {
-  COURSE_FULL: '선택하신 강의의 정원이 마감되었습니다. 다른 강의를 선택해주세요.',
-  DUPLICATE_ENROLLMENT: '이미 신청한 강의입니다.',
-  INVALID_INPUT: '입력 정보를 다시 확인해주세요.',
-  UNKNOWN_ERROR: '일시적인 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
+const ERROR_MESSAGES: Record<string, { message: string; action?: { label: string; step: 1 | 2 } }> = {
+  COURSE_FULL: {
+    message: '선택하신 강의의 정원이 마감되었습니다.',
+    action: { label: '다른 강의 선택하기', step: 1 },
+  },
+  DUPLICATE_ENROLLMENT: {
+    message: '이미 신청한 강의입니다. 이메일 주소를 확인해주세요.',
+    action: { label: '이메일 수정하기', step: 2 },
+  },
+  INVALID_INPUT: {
+    message: '입력 정보에 문제가 있습니다.',
+    action: { label: '입력 정보 다시 확인하기', step: 2 },
+  },
+  UNKNOWN_ERROR: {
+    message: '일시적인 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
+  },
 };
 
 function formatPrice(p: number) {
@@ -70,6 +83,7 @@ function Divider() {
 export function Step3Confirmation() {
   const { state, dispatch } = useEnrollmentForm();
   const { mutate, isPending, error, reset: resetMutation } = useEnrollment();
+  const [termsOpen, setTermsOpen] = useState(false);
 
   const step1 = state.step1;
   const step2 = state.step2;
@@ -139,14 +153,26 @@ export function Step3Confirmation() {
     ? (ERROR_MESSAGES[error.code] ?? ERROR_MESSAGES.UNKNOWN_ERROR)
     : null;
 
+
   return (
+    <>
+    <TermsModal open={termsOpen} onClose={() => setTermsOpen(false)} />
     <form onSubmit={handleSubmit(onSubmit)} noValidate>
       <div className="space-y-4">
 
         {/* API error banner */}
         {apiError && (
-          <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-            {apiError}
+          <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm">
+            <p className="text-red-700 font-medium">{apiError.message}</p>
+            {apiError.action && (
+              <button
+                type="button"
+                onClick={() => dispatch({ type: 'GO_TO_STEP', payload: apiError.action!.step })}
+                className="mt-2 inline-flex items-center gap-1 text-red-600 hover:text-red-800 font-semibold underline underline-offset-2"
+              >
+                {apiError.action.label} →
+              </button>
+            )}
           </div>
         )}
 
@@ -225,6 +251,7 @@ export function Step3Confirmation() {
               이용약관에 동의합니다
               <button
                 type="button"
+                onClick={() => setTermsOpen(true)}
                 className="ml-1.5 text-xs text-blue-600 hover:underline"
               >
                 전문 보기
@@ -262,5 +289,6 @@ export function Step3Confirmation() {
 
       </div>
     </form>
+    </>
   );
 }

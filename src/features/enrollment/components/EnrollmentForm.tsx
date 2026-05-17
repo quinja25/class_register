@@ -111,7 +111,7 @@ function DraftRestoreBanner() {
 }
 
 function EnrollmentFormInner() {
-  const { state, hasDraft } = useEnrollmentForm();
+  const { state, dispatch, hasDraft } = useEnrollmentForm();
   const prevStepRef = useRef(state.step);
   const [animKey, setAnimKey] = useState(0);
   const [animClass, setAnimClass] = useState('');
@@ -146,7 +146,10 @@ function EnrollmentFormInner() {
         {hasDraft && !state.step1 && <DraftRestoreBanner />}
 
         <div className="mb-10">
-          <StepIndicator currentStep={state.step} />
+          <StepIndicator
+            currentStep={state.step}
+            onStepClick={(step) => dispatch({ type: 'GO_TO_STEP', payload: step })}
+          />
         </div>
 
         <div key={animKey} className={`bg-white rounded-2xl shadow-sm border border-zinc-200 p-8 ${animClass}`}>

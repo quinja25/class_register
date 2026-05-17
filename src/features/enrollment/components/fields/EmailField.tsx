@@ -68,6 +68,19 @@ export function EmailField({
     if (e.key === 'Tab' && suggestion) {
       e.preventDefault();
       acceptSuggestion(suggestion);
+      // Move focus to next focusable field after autocomplete
+      const current = e.currentTarget;
+      setTimeout(() => {
+        const focusable = Array.from(
+          document.querySelectorAll<HTMLElement>(
+            'input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled])'
+          )
+        );
+        const idx = focusable.indexOf(current);
+        if (idx !== -1 && idx < focusable.length - 1) {
+          focusable[idx + 1].focus();
+        }
+      }, 0);
     }
   }
 

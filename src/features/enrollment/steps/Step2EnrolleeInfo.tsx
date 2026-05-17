@@ -156,6 +156,7 @@ export function Step2EnrolleeInfo() {
         <input type="hidden" {...register('type')} />
 
         <div className="space-y-6">
+          <p className="text-xs text-zinc-400 text-right"><span className="text-red-500">*</span> 필수 항목</p>
           {/* Type selector */}
           <div>
             <p className="text-sm font-medium text-zinc-700 mb-2">신청 유형</p>

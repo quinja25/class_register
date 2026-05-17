@@ -59,11 +59,25 @@ export function CourseCard({ course, selected, onSelect }: CourseCardProps) {
 
       <p className="text-sm text-zinc-500 mb-3 line-clamp-2">{course.description}</p>
 
-      <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-zinc-500">
+      <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-zinc-500 mb-3">
         <span>강사: {course.instructor}</span>
         <span>{formatDateRange(course.startDate, course.endDate)}</span>
         <span className="font-medium text-zinc-700">{formatPrice(course.price)}</span>
       </div>
+
+      {/* Capacity bar */}
+      {!isFull && (
+        <div>
+          <div className="h-1.5 w-full rounded-full bg-zinc-100 overflow-hidden">
+            <div
+              className={`h-full rounded-full transition-all ${
+                type === 'almost' ? 'bg-orange-400' : 'bg-blue-400'
+              }`}
+              style={{ width: `${(course.currentEnrollment / course.maxCapacity) * 100}%` }}
+            />
+          </div>
+        </div>
+      )}
     </button>
   );
 }
