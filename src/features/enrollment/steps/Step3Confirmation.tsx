@@ -216,7 +216,7 @@ export function Step3Confirmation() {
               <p className="text-xs font-semibold text-zinc-600 mb-2">단체 정보</p>
               <div className="space-y-2">
                 <InfoRow label="단체명" value={groupData.organizationName} />
-                <InfoRow label="신청 인원수" value={`${groupData.headCount}명`} />
+                <InfoRow label="총 신청 인원" value={`${groupData.headCount + 1}명 (대표자 포함)`} />
                 <InfoRow label="담당자 연락처" value={groupData.contactPerson} />
               </div>
 

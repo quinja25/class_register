@@ -54,6 +54,24 @@ function CompletionScreen() {
           <span className="text-zinc-500">신청 유형</span>
           <span className="text-zinc-800">{isGroup ? '단체 신청' : '개인 신청'}</span>
         </div>
+        {step2?.name && (
+          <div className="flex items-center justify-between px-4 py-3 text-sm">
+            <span className="text-zinc-500">신청자</span>
+            <span className="text-zinc-800">{step2.name}</span>
+          </div>
+        )}
+        {isGroup && step2?.type === 'group' && (
+          <>
+            <div className="flex items-center justify-between px-4 py-3 text-sm">
+              <span className="text-zinc-500">단체명</span>
+              <span className="text-zinc-800">{step2.organizationName}</span>
+            </div>
+            <div className="flex items-center justify-between px-4 py-3 text-sm">
+              <span className="text-zinc-500">총 신청 인원</span>
+              <span className="text-zinc-800">{step2.headCount + 1}명 <span className="text-zinc-400 text-xs">(대표자 포함)</span></span>
+            </div>
+          </>
+        )}
         <div className="flex items-center justify-between px-4 py-3 text-sm">
           <span className="text-zinc-500">상태</span>
           <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
