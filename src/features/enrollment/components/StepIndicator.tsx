@@ -60,7 +60,7 @@ export function StepIndicator({ currentStep, onStepClick }: StepIndicatorProps) 
                 circle
               )}
               <span
-                className={`text-xs font-medium ${
+                className={`hidden sm:block text-xs font-medium ${
                   isActive ? 'text-blue-600' : isDone ? 'text-zinc-600' : 'text-zinc-400'
                 } ${isClickable ? 'cursor-pointer hover:text-blue-600' : ''}`}
                 onClick={isClickable ? () => onStepClick(number as Step) : undefined}
