@@ -10,8 +10,6 @@ interface ParticipantRowProps {
   onBlurEmail: () => void;
   nameError?: string;
   emailError?: string;
-  applicantEmail?: string;
-  currentEmail?: string;
   emailDefaultValue?: string;
   onCompleteEmail: (value: string) => void;
 }
@@ -24,16 +22,9 @@ export function ParticipantRow({
   onBlurEmail,
   nameError,
   emailError,
-  applicantEmail,
-  currentEmail,
   emailDefaultValue = '',
   onCompleteEmail,
 }: ParticipantRowProps) {
-  const isSameAsApplicant =
-    !emailError &&
-    !!applicantEmail &&
-    !!currentEmail &&
-    currentEmail.toLowerCase() === applicantEmail.toLowerCase();
 
   return (
     <div className="flex items-start gap-2">
@@ -60,9 +51,6 @@ export function ParticipantRow({
           defaultValue={emailDefaultValue}
           onComplete={onCompleteEmail}
         />
-        {isSameAsApplicant && (
-          <p className="mt-0.5 text-xs text-amber-600">대표 신청자와 동일한 이메일입니다</p>
-        )}
       </div>
       </div>
     </div>

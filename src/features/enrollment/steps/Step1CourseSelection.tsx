@@ -10,6 +10,7 @@ import { CategoryFilter } from '../components/CategoryFilter';
 import { CourseCard } from '../components/CourseCard';
 import { EnrollmentTypeSelector } from '../components/EnrollmentTypeSelector';
 import type { Course, CourseCategory } from '../types/enrollment';
+import { formatPrice, formatDateRange } from '../utils/format';
 
 function CourseCardSkeleton() {
   return (
@@ -26,12 +27,7 @@ function CourseCardSkeleton() {
   );
 }
 
-function formatPrice(price: number) {
-  return price.toLocaleString('ko-KR') + '원';
-}
-
 function SelectedCourseSummary({ course }: { course: Course }) {
-  const fmt = (d: string) => d.replace(/-/g, '.').slice(2);
   return (
     <div className="flex items-center gap-3 rounded-lg bg-blue-50 border border-blue-200 px-4 py-2.5 text-sm">
       <svg className="h-4 w-4 shrink-0 text-blue-500" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
@@ -40,7 +36,7 @@ function SelectedCourseSummary({ course }: { course: Course }) {
       <div className="flex flex-wrap gap-x-3 gap-y-0.5">
         <span className="font-semibold text-blue-900">{course.title}</span>
         <span className="text-blue-700">{formatPrice(course.price)}</span>
-        <span className="text-blue-600">{fmt(course.startDate)} ~ {fmt(course.endDate)}</span>
+        <span className="text-blue-600">{formatDateRange(course.startDate, course.endDate)}</span>
       </div>
     </div>
   );
@@ -49,7 +45,6 @@ function SelectedCourseSummary({ course }: { course: Course }) {
 export function Step1CourseSelection() {
   const { state, dispatch } = useEnrollmentForm();
   const [selectedCategory, setSelectedCategory] = useState<CourseCategory | null>(null);
-  const [allCourses, setAllCourses] = useState<Course[]>([]);
 
   const courseListRef = useRef<HTMLDivElement>(null);
   const enrollmentTypeRef = useRef<HTMLDivElement>(null);
@@ -72,7 +67,7 @@ export function Step1CourseSelection() {
 
   // Keep a full unfiltered course list for the selected course summary
   const { data: allData } = useCourses(undefined);
-  const selectedCourse = (allData?.courses ?? allCourses).find(c => c.id === selectedCourseId);
+  const selectedCourse = allData?.courses?.find(c => c.id === selectedCourseId);
 
   const scrollAndFocus = useCallback((ref: React.RefObject<HTMLDivElement | null>) => {
     ref.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });

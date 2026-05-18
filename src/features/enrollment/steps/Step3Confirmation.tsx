@@ -9,6 +9,7 @@ import { useEnrollment } from '../hooks/useEnrollment';
 import { TermsModal } from '../components/TermsModal';
 import type { GroupStep2Values } from '../schemas/step2Schema';
 import type { EnrollmentRequest } from '../types/enrollment';
+import { formatPrice, formatDateRange } from '../utils/format';
 
 const CATEGORY_LABELS: Record<string, string> = {
   development: '개발',
@@ -34,15 +35,6 @@ const ERROR_MESSAGES: Record<string, { message: string; action?: { label: string
     message: '일시적인 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
   },
 };
-
-function formatPrice(p: number) {
-  return p.toLocaleString('ko-KR') + '원';
-}
-
-function formatDateRange(start: string, end: string) {
-  const fmt = (d: string) => d.replace(/-/g, '.').slice(2);
-  return `${fmt(start)} ~ ${fmt(end)}`;
-}
 
 function SectionCard({ title, onEdit, children }: {
   title: string;

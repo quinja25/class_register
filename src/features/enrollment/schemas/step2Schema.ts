@@ -58,7 +58,19 @@ const groupSchema = baseInfoSchema.extend({
 export const step2Schema = z.discriminatedUnion('type', [
   personalSchema,
   groupSchema,
-]);
+]).superRefine((data, ctx) => {
+  if (data.type !== 'group') return;
+  const applicantEmail = data.email.toLowerCase();
+  data.participants.forEach((p, i) => {
+    if (p.email.toLowerCase() === applicantEmail) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['participants', i, 'email'],
+        message: '대표 신청자와 동일한 이메일은 사용할 수 없습니다',
+      });
+    }
+  });
+});
 
 export type Step2Values = z.infer<typeof step2Schema>;
 export type PersonalStep2Values = z.infer<typeof personalSchema>;

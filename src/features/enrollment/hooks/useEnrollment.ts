@@ -9,7 +9,12 @@ async function postEnrollment(body: EnrollmentRequest): Promise<EnrollmentRespon
   });
 
   if (!res.ok) {
-    const error: EnrollmentApiError = await res.json();
+    let error: EnrollmentApiError;
+    try {
+      error = await res.json();
+    } catch {
+      error = { code: 'UNKNOWN_ERROR', message: 'Server error' };
+    }
     throw error;
   }
 

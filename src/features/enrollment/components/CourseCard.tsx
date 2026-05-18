@@ -1,6 +1,7 @@
 'use client';
 
 import type { Course } from '../types/enrollment';
+import { formatPrice, formatDateRange } from '../utils/format';
 
 interface CourseCardProps {
   course: Course;
@@ -13,15 +14,6 @@ function getCapacityStatus(course: Course) {
   if (remaining === 0) return { type: 'full' as const, remaining };
   if (remaining <= 5) return { type: 'almost' as const, remaining };
   return { type: 'normal' as const, remaining };
-}
-
-function formatPrice(price: number) {
-  return price.toLocaleString('ko-KR') + '원';
-}
-
-function formatDateRange(start: string, end: string) {
-  const fmt = (d: string) => d.replace(/-/g, '.').slice(2); // "26.07.01"
-  return `${fmt(start)} ~ ${fmt(end)}`;
 }
 
 export function CourseCard({ course, selected, onSelect }: CourseCardProps) {

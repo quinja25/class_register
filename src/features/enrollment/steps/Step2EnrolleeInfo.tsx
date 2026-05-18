@@ -84,8 +84,6 @@ export function Step2EnrolleeInfo() {
   const currentType = watch('type');
   const headCount = watch('headCount');
   const phone = watch('phone');
-  const applicantEmail = watch('email');
-  const participants = watch('participants');
   const motivation = watch('motivation');
   const groupErrors = errors as FieldErrors<GroupStep2Values>;
 
@@ -296,8 +294,6 @@ export function Step2EnrolleeInfo() {
                         onBlurEmail={() => trigger(`participants.${index}.email`)}
                         nameError={groupErrors.participants?.[index]?.name?.message}
                         emailError={groupErrors.participants?.[index]?.email?.message}
-                        applicantEmail={applicantEmail}
-                        currentEmail={participants?.[index]?.email}
                         emailDefaultValue={field.email}
                         onCompleteEmail={(v) => setValue(`participants.${index}.email`, v, { shouldValidate: true })}
                       />
