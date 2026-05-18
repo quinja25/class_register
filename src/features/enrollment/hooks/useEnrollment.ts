@@ -18,7 +18,7 @@ async function postEnrollment(body: EnrollmentRequest): Promise<EnrollmentRespon
     try {
       error = await res.json();
     } catch {
-      error = { code: 'UNKNOWN_ERROR', message: 'Server error' };
+      error = { code: 'UNKNOWN_ERROR', message: '서버 오류가 발생했습니다.' };
     }
     throw error;
   }

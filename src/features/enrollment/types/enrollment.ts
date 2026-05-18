@@ -50,13 +50,6 @@ export interface GroupEnrollment extends BaseEnrolleeInfo {
 
 export type EnrolleeInfo = IndividualEnrollment | GroupEnrollment;
 
-export interface EnrollmentFormState {
-  selectedCourse: Course | null;
-  enrollmentType: EnrollmentType | null;
-  enrolleeInfo: Partial<EnrolleeInfo>;
-  agreedToTerms: boolean;
-}
-
 // API request shapes
 export interface PersonalEnrollmentRequest {
   courseId: string;

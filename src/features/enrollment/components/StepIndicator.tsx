@@ -44,6 +44,7 @@ export function StepIndicator({ currentStep, onStepClick }: StepIndicatorProps) 
         return (
           <li
             key={number}
+            aria-current={isActive ? 'step' : undefined}
             className={`flex items-center ${index < STEPS.length - 1 ? 'flex-1' : ''}`}
           >
             <div className="flex flex-col items-center gap-1">

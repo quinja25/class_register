@@ -98,7 +98,7 @@ export function Step2EnrolleeInfo() {
     } else if (count < fields.length) {
       remove(Array.from({ length: fields.length - count }, (_, i) => fields.length - 1 - i));
     }
-  }, [headCount, currentType, fields.length, maxHeadCount]);
+  }, [headCount, currentType, fields.length, maxHeadCount, append, remove]);
 
   function handleTypeClick(newType: 'personal' | 'group') {
     if (newType === currentType) return;
