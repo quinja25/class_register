@@ -25,7 +25,7 @@ export function EnrollmentTypeSelector({ register, error }: EnrollmentTypeSelect
   return (
     <div>
       <p className="text-sm font-medium text-zinc-700 mb-2">신청 유형</p>
-      <div className="flex gap-3">
+      <div className="flex flex-col sm:flex-row gap-3">
         {OPTIONS.map(({ value, label, description }) => (
           <label
             key={value}

@@ -105,7 +105,7 @@ function DraftRestoreBanner() {
   const { restoreDraft, dismissDraft } = useEnrollmentForm();
 
   return (
-    <div className="mb-6 flex items-center justify-between gap-4 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm">
+    <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm">
       <div className="flex items-center gap-2 text-blue-800">
         <span>📋</span>
         <span>이전에 작성하던 신청서가 있습니다.</span>

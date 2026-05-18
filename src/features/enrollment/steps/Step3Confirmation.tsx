@@ -70,7 +70,7 @@ function InfoRow({ label, value }: { label: string; value?: string | null }) {
   if (!value) return null;
   return (
     <div className="flex gap-3 text-sm">
-      <span className="w-28 flex-shrink-0 text-zinc-500">{label}</span>
+      <span className="w-24 sm:w-28 flex-shrink-0 text-zinc-500">{label}</span>
       <span className="text-zinc-900 break-all">{value}</span>
     </div>
   );
