@@ -17,7 +17,7 @@ interface CategoryFilterProps {
 
 export function CategoryFilter({ categories, selected, onChange }: CategoryFilterProps) {
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
       <button
         type="button"
         onClick={() => onChange(null)}

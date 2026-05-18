@@ -203,7 +203,7 @@ export function Step3Confirmation() {
           onEdit={() => dispatch({ type: 'GO_TO_STEP', payload: 2 })}
         >
           <div className="space-y-2">
-            <InfoRow label="신청 유형" value={isGroup ? '단체 신청' : '개인 신청'} />
+            {isGroup && <InfoRow label="신청 유형" value="단체 신청" />}
             <InfoRow label="이름" value={step2.name} />
             <InfoRow label="이메일" value={step2.email} />
             <InfoRow label="전화번호" value={step2.phone} />

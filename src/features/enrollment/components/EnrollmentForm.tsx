@@ -50,10 +50,12 @@ function CompletionScreen() {
             <span className="text-zinc-800 font-medium text-right">{course.title}</span>
           </div>
         )}
-        <div className="flex items-center justify-between px-4 py-3 text-sm">
-          <span className="text-zinc-500">신청 유형</span>
-          <span className="text-zinc-800">{isGroup ? '단체 신청' : '개인 신청'}</span>
-        </div>
+        {isGroup && (
+          <div className="flex items-center justify-between px-4 py-3 text-sm">
+            <span className="text-zinc-500">신청 유형</span>
+            <span className="text-zinc-800">단체 신청</span>
+          </div>
+        )}
         {step2?.name && (
           <div className="flex items-center justify-between px-4 py-3 text-sm">
             <span className="text-zinc-500">신청자</span>
@@ -145,9 +147,9 @@ function EnrollmentFormInner() {
 
   if (state.result) {
     return (
-      <div className="min-h-screen bg-zinc-50 py-10 px-4">
+      <div className="min-h-screen bg-zinc-50 py-4 sm:py-10 px-4">
         <div className="max-w-2xl mx-auto">
-          <div className="bg-white rounded-2xl shadow-sm border border-zinc-200 p-8">
+          <div className="bg-white rounded-2xl shadow-sm border border-zinc-200 p-4 sm:p-8">
             <CompletionScreen />
           </div>
         </div>
@@ -156,7 +158,7 @@ function EnrollmentFormInner() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50 py-10 px-4">
+    <div className="min-h-screen bg-zinc-50 py-4 sm:py-10 px-4">
       <div className="max-w-2xl mx-auto">
         <h1 className="text-2xl font-bold text-zinc-900 mb-8 text-center">수강 신청</h1>
 
@@ -170,7 +172,7 @@ function EnrollmentFormInner() {
           />
         </div>
 
-        <div key={animKey} className={`bg-white rounded-2xl shadow-sm border border-zinc-200 p-8 ${animClass}`}>
+        <div key={animKey} className={`bg-white rounded-2xl shadow-sm border border-zinc-200 p-4 sm:p-8 ${animClass}`}>
           {state.step === 1 && <Step1CourseSelection />}
           {state.step === 2 && <Step2EnrolleeInfo />}
           {state.step === 3 && <Step3Confirmation />}
