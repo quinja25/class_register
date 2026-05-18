@@ -48,7 +48,6 @@ export function TextAreaField({
         onBlur={onBlur}
         aria-invalid={!!error}
         rows={rows}
-        maxLength={maxLength}
         className={inputCn(!!error) + ' resize-none'}
         placeholder={placeholder}
       />
