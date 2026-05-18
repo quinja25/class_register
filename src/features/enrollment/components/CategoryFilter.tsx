@@ -21,7 +21,7 @@ export function CategoryFilter({ categories, selected, onChange }: CategoryFilte
       <button
         type="button"
         onClick={() => onChange(null)}
-        className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
+        className={`px-4 py-1.5 min-h-[44px] rounded-full text-sm font-medium transition-colors ${
           selected === null
             ? 'bg-blue-600 text-white'
             : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
@@ -36,7 +36,7 @@ export function CategoryFilter({ categories, selected, onChange }: CategoryFilte
             key={category}
             type="button"
             onClick={() => onChange(category)}
-            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
+            className={`px-4 py-1.5 min-h-[44px] rounded-full text-sm font-medium transition-colors ${
               selected === category
                 ? 'bg-blue-600 text-white'
                 : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
