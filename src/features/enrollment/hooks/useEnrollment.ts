@@ -2,11 +2,16 @@ import { useMutation } from '@tanstack/react-query';
 import type { EnrollmentRequest, EnrollmentResponse, EnrollmentApiError } from '../types/enrollment';
 
 async function postEnrollment(body: EnrollmentRequest): Promise<EnrollmentResponse> {
-  const res = await fetch('/api/enrollments', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
+  let res: Response;
+  try {
+    res = await fetch('/api/enrollments', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+  } catch {
+    throw { code: 'UNKNOWN_ERROR', message: '네트워크 오류가 발생했습니다.' } satisfies EnrollmentApiError;
+  }
 
   if (!res.ok) {
     let error: EnrollmentApiError;
