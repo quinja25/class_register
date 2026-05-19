@@ -37,7 +37,7 @@ yarn-error.log*
 CLAUDE.md
 PLAN.md
 AGENTS.md
-api_schema.md
+sample_api_schema.md
 
 # omc files (can opt-in for committing if needed)
 .omc

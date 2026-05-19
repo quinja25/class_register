@@ -11,7 +11,7 @@ import { TextAreaField } from '../components/fields/TextAreaField';
 import { EmailField } from '../components/fields/EmailField';
 import { ParticipantRow } from '../components/fields/ParticipantRow';
 import { inputCn, FieldError } from '../components/fields/FormField';
-import { formatPhone } from '../utils/formatPhone';
+import { formatPhone } from '../utils/format';
 
 // Flat form type to avoid discriminated union conflicts with RHF.
 // Zod resolver still validates against step2Schema at submit time.
